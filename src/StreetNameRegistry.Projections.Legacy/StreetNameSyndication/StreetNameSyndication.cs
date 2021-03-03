@@ -32,27 +32,12 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameSyndication
         public bool IsComplete { get; set; }
 
         public DateTimeOffset RecordCreatedAtAsDateTimeOffset { get; set; }
-        public DateTimeOffset LastChangedOnAsDateTimeOffset { get; set; }
 
         public Instant RecordCreatedAt
         {
             get => Instant.FromDateTimeOffset(RecordCreatedAtAsDateTimeOffset);
             set => RecordCreatedAtAsDateTimeOffset = value.ToDateTimeOffset();
         }
-
-        public Instant LastChangedOn
-        {
-            get => Instant.FromDateTimeOffset(LastChangedOnAsDateTimeOffset);
-            set => LastChangedOnAsDateTimeOffset = value.ToDateTimeOffset();
-        }
-
-        public Application? Application { get; set; }
-        public Modification? Modification { get; set; }
-        public string? Operator { get; set; }
-        public Organisation? Organisation { get; set; }
-        public string? Reason { get; set; }
-        public string? EventDataAsXml { get; set; }
-        public DateTimeOffset SyndicationItemCreatedAt { get; set; }
 
         public StreetNameSyndicationItem CloneAndApplyEventInfo(
             long newPosition,
@@ -83,15 +68,7 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameSyndication
                 Status = Status,
                 IsComplete = IsComplete,
 
-                Reason = Reason,
-                Modification = Modification,
-                Operator = Operator,
-                Organisation = Organisation,
-                Application = Application,
-
-                RecordCreatedAt = RecordCreatedAt,
-                LastChangedOn = lastChangedOn,
-                SyndicationItemCreatedAt = DateTimeOffset.UtcNow
+                RecordCreatedAt = RecordCreatedAt
             };
 
             editFunc(newItem);
@@ -131,18 +108,8 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameSyndication
             b.Property(x => x.IsComplete);
 
             b.Property(x => x.RecordCreatedAtAsDateTimeOffset).HasColumnName("RecordCreatedAt");
-            b.Property(x => x.LastChangedOnAsDateTimeOffset).HasColumnName("LastChangedOn");
-
-            b.Property(x => x.Application);
-            b.Property(x => x.Modification);
-            b.Property(x => x.Operator);
-            b.Property(x => x.Organisation);
-            b.Property(x => x.Reason);
-            b.Property(x => x.EventDataAsXml);
-            b.Property(x => x.SyndicationItemCreatedAt).IsRequired();
 
             b.Ignore(x => x.RecordCreatedAt);
-            b.Ignore(x => x.LastChangedOn);
 
             b.HasIndex(x => x.StreetNameId);
         }

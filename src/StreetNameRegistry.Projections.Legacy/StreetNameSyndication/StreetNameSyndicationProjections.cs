@@ -18,13 +18,8 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameSyndication
                     StreetNameId = message.Message.StreetNameId,
                     NisCode = message.Message.NisCode,
                     RecordCreatedAt = message.Message.Provenance.Timestamp,
-                    LastChangedOn = message.Message.Provenance.Timestamp,
                     ChangeType = message.EventName,
-                    SyndicationItemCreatedAt = DateTimeOffset.UtcNow
                 };
-
-                streetNameSyndicationItem.ApplyProvenance(message.Message.Provenance);
-                streetNameSyndicationItem.SetEventData(message.Message, message.EventName);
 
                 await context
                     .StreetNameSyndication

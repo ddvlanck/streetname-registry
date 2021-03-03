@@ -32,9 +32,6 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameSyndication
                 provenance.Timestamp,
                 applyEventInfoOn);
 
-            newStreetNameSyndicationItem.ApplyProvenance(provenance);
-            newStreetNameSyndicationItem.SetEventData(message.Message, message.EventName);
-
             await context
                 .StreetNameSyndication
                 .AddAsync(newStreetNameSyndicationItem, ct);
@@ -55,20 +52,6 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameSyndication
                    .Where(x => x.StreetNameId == streetNameId)
                    .OrderByDescending(x => x.Position)
                    .FirstOrDefaultAsync(ct);
-
-        public static void ApplyProvenance(
-            this StreetNameSyndicationItem item,
-            ProvenanceData provenance)
-        {
-            item.Application = provenance.Application;
-            item.Modification = provenance.Modification;
-            item.Operator = provenance.Operator;
-            item.Organisation = provenance.Organisation;
-            item.Reason = provenance.Reason;
-        }
-
-        public static void SetEventData<T>(this StreetNameSyndicationItem syndicationItem, T message, string eventName)
-            => syndicationItem.EventDataAsXml = message.ToXml(eventName).ToString(SaveOptions.DisableFormatting);
 
         private static ProjectionItemNotFoundException<StreetNameSyndicationProjections> DatabaseItemNotFound(Guid streetNameId)
             => new ProjectionItemNotFoundException<StreetNameSyndicationProjections>(streetNameId.ToString("D"));
