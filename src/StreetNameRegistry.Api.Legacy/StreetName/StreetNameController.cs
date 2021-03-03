@@ -278,7 +278,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
         /// <param name="responseOptions"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        [HttpGet("sync")]
+        /*[HttpGet("sync")]
         [Produces("text/xml")]
         [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -303,6 +303,12 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
                 .Select(item => item.SyndicationItemCreatedAt)
                 .FirstOrDefaultAsync(cancellationToken);
 
+            var lastFeedUpdate = await context
+                .StreetNameSyndication
+                .AsNoTracking()
+                .OrderByDescending(item => item.Position)
+                .FirstOrDefaultAsync(cancellationToken);
+
             if (lastFeedUpdate == default)
                 lastFeedUpdate = new DateTimeOffset(2020, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
@@ -318,7 +324,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
                 ContentType = MediaTypeNames.Text.Xml,
                 StatusCode = StatusCodes.Status200OK
             };
-        }
+        }*/
 
         /// <summary>
         /// Zoek naar straatnamen in het Vlaams Gewest in het BOSA formaat.
@@ -356,6 +362,94 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
                     .FilterAsync(filter, cancellationToken);
 
             return Ok(streetNameBosaResponse);
+        }
+
+        [HttpGet("base")]
+        [Produces("application/ld+json")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Base(
+           [FromServices] IConfiguration configuration,
+           [FromServices] LegacyContext context,
+           [FromServices] IOptions<ResponseOptions> responseOptions,
+           CancellationToken cancellationToken = default)
+        {
+            var filtering = Request.ExtractFilteringRequest<StreetNameLDESFilter>();
+            var sorting = Request.ExtractSortingRequest();
+            var pagination = Request.ExtractPaginationRequest();
+
+            var xPaginationHeader = Request.Headers["x-pagination"].ToString().Split(",");
+            var offset = Int32.Parse(xPaginationHeader[0]);
+            var pageSize = Int32.Parse(xPaginationHeader[1]);
+            var page = (offset / pageSize) + 1;
+
+            var streetNamesPaged =
+                new StreetNameLinkedDataEventStreamQuery(context).Fetch(filtering, sorting, pagination);
+
+            var ldesConfiguration = configuration.GetSection("LinkedDataEventStream");
+
+            var streetNameVersionObjects =
+                streetNamesPaged
+                .Items
+                .Select(x => new StreetNameVersionObject(ldesConfiguration,
+                x.Position,
+                x.PersistentLocalId,
+                x.ChangeType,
+                x.RecordCreatedAt,
+                x.Status,
+                x.NisCode,
+                x.NameDutch,
+                x.NameFrench,
+                x.NameGerman,
+                x.NameEnglish,
+                x.HomonymAdditionDutch,
+                x.HomonymAdditionFrench,
+                x.HomonymAdditionGerman,
+                x.HomonymAdditionEnglish)).ToList();
+
+            // When a page is full, it will never change so we add cache header
+            if (streetNameVersionObjects.Count == pageSize)
+            {
+                Response.Headers["cache-control"] = "public, max-age=31557600";
+            }
+
+            return Ok(new StreetNameLinkedDataEventStreamResponse
+            {
+                Id = StreetNameLdesMetadata.GetPageIdentifier(ldesConfiguration, page),
+                CollectionLink = StreetNameLdesMetadata.GetCollectionLink(ldesConfiguration),
+                StreetNameShape = new Uri($"{ldesConfiguration["ApiEndpoint"]}/shape"),
+                HypermediaControls = StreetNameLdesMetadata.GetHypermediaControls(streetNameVersionObjects, ldesConfiguration, page, pageSize),
+                StreetNames = streetNameVersionObjects
+            });
+
+        }
+
+        /// <summary>
+        /// Vraag de shape van straatnamen op
+        /// </summary>
+        /// <param name="configuration"></param>
+        /// <param name="context"></param>
+        /// <param name="responseOptions"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+
+        [HttpGet("base/shape")]
+        [Produces("application/ld+json")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> Shape(
+            [FromServices] IConfiguration configuration,
+            [FromServices] LegacyContext context,
+            [FromServices] IOptions<ResponseOptions> responseOptions,
+            CancellationToken cancellationToken = default)
+        {
+
+            var ldesConfiguration = configuration.GetSection("LinkedDataEventStream");
+
+            return Ok(new StreetNameShaclShapeResponse
+            {
+                Id = new Uri($"{ldesConfiguration["ApiEndpoint"]}/shape")
+            });
         }
 
         private static GeografischeNaam GetGeografischeNaamByTaal(StreetNameListItem item, Language? taal)

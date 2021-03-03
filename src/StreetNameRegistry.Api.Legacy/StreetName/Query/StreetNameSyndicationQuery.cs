@@ -24,7 +24,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         public int? PersistentLocalId { get; }
         public string NisCode { get; }
         public Instant RecordCreatedAt { get; }
-        public Instant LastChangedOn { get; }
         public StreetNameStatus? Status { get; }
         public string NameDutch { get; }
         public string NameFrench { get; }
@@ -35,9 +34,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         public string HomonymAdditionGerman { get; }
         public string HomonymAdditionEnglish { get; }
         public bool IsComplete { get; }
-        public Organisation? Organisation { get; }
-        public string Reason { get; }
-        public string EventDataAsXml { get; }
 
         public StreetNameSyndicationQueryResult(
             Guid? streetNameId,
@@ -46,10 +42,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             string nisCode,
             string changeType,
             Instant recordCreatedAt,
-            Instant lastChangedOn,
-            bool isComplete,
-            Organisation? organisation,
-            string reason)
+            bool isComplete)
         {
             ContainsEvent = false;
             ContainsObject = false;
@@ -60,38 +53,27 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             NisCode = nisCode;
             ChangeType = changeType;
             RecordCreatedAt = recordCreatedAt;
-            LastChangedOn = lastChangedOn;
             IsComplete = isComplete;
-            Organisation = organisation;
-            Reason = reason;
         }
 
-        public StreetNameSyndicationQueryResult(
+        /*public StreetNameSyndicationQueryResult(
             Guid? streetNameId,
             long position,
             int? persistentLocalId,
             string nisCode,
             string changeType,
             Instant recordCreatedAt,
-            Instant lastChangedOn,
-            bool isComplete,
-            Organisation? organisation,
-            string reason,
-            string eventDataAsXml)
+            bool isComplete)
             : this(streetNameId,
                 position,
                 persistentLocalId,
                 nisCode,
                 changeType,
                 recordCreatedAt,
-                lastChangedOn,
-                isComplete,
-                organisation,
-                reason)
+                isComplete)
         {
             ContainsEvent = true;
-            EventDataAsXml = eventDataAsXml;
-        }
+        }*/
 
         public StreetNameSyndicationQueryResult(
             Guid? streetNameId,
@@ -100,7 +82,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             string nisCode,
             string changeType,
             Instant recordCreatedAt,
-            Instant lastChangedOn,
             StreetNameStatus? status,
             string nameDutch,
             string nameFrench,
@@ -110,9 +91,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             string homonymAdditionFrench,
             string homonymAdditionGerman,
             string homonymAdditionEnglish,
-            bool isComplete,
-            Organisation? organisation,
-            string reason)
+            bool isComplete)
             : this(
                 streetNameId,
                 position,
@@ -120,10 +99,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                 nisCode,
                 changeType,
                 recordCreatedAt,
-                lastChangedOn,
-                isComplete,
-                organisation,
-                reason)
+                isComplete)
         {
             ContainsObject = true;
 
@@ -138,14 +114,13 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             HomonymAdditionEnglish = homonymAdditionEnglish;
         }
 
-        public StreetNameSyndicationQueryResult(
+        /*public StreetNameSyndicationQueryResult(
             Guid? streetNameId,
             long position,
             int? persistentLocalId,
             string nisCode,
             string changeType,
             Instant recordCreatedAt,
-            Instant lastChangedOn,
             StreetNameStatus? status,
             string nameDutch,
             string nameFrench,
@@ -155,10 +130,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             string homonymAdditionFrench,
             string homonymAdditionGerman,
             string homonymAdditionEnglish,
-            bool isComplete,
-            Organisation? organisation,
-            string reason,
-            string eventDataAsXml)
+            bool isComplete)
             : this(
                 streetNameId,
                 position,
@@ -166,7 +138,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                 nisCode,
                 changeType,
                 recordCreatedAt,
-                lastChangedOn,
                 status,
                 nameDutch,
                 nameFrench,
@@ -176,14 +147,10 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                 homonymAdditionFrench,
                 homonymAdditionGerman,
                 homonymAdditionEnglish,
-                isComplete,
-                organisation,
-                reason)
+                isComplete)
         {
             ContainsEvent = true;
-
-            EventDataAsXml = eventDataAsXml;
-        }
+        }*/
     }
 
     public class StreetNameSyndicationQuery : Query<StreetNameSyndicationItem, StreetNameSyndicationFilter, StreetNameSyndicationQueryResult>
@@ -215,7 +182,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                         x.NisCode,
                         x.ChangeType,
                         x.RecordCreatedAt,
-                        x.LastChangedOn,
                         x.Status,
                         x.NameDutch,
                         x.NameFrench,
@@ -225,10 +191,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                         x.HomonymAdditionFrench,
                         x.HomonymAdditionGerman,
                         x.HomonymAdditionEnglish,
-                        x.IsComplete,
-                        x.Organisation,
-                        x.Reason,
-                        x.EventDataAsXml);
+                        x.IsComplete);
 
                 if (_embedEvent)
                     return x => new StreetNameSyndicationQueryResult(
@@ -238,11 +201,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                         x.NisCode,
                         x.ChangeType,
                         x.RecordCreatedAt,
-                        x.LastChangedOn,
-                        x.IsComplete,
-                        x.Organisation,
-                        x.Reason,
-                        x.EventDataAsXml);
+                        x.IsComplete);
 
                 if (_embedObject)
                     return x => new StreetNameSyndicationQueryResult(
@@ -252,7 +211,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                         x.NisCode,
                         x.ChangeType,
                         x.RecordCreatedAt,
-                        x.LastChangedOn,
                         x.Status,
                         x.NameDutch,
                         x.NameFrench,
@@ -262,9 +220,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                         x.HomonymAdditionFrench,
                         x.HomonymAdditionGerman,
                         x.HomonymAdditionEnglish,
-                        x.IsComplete,
-                        x.Organisation,
-                        x.Reason);
+                        x.IsComplete);
 
                 return x => new StreetNameSyndicationQueryResult(
                     x.StreetNameId,
@@ -273,10 +229,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
                     x.NisCode,
                     x.ChangeType,
                     x.RecordCreatedAt,
-                    x.LastChangedOn,
-                    x.IsComplete,
-                    x.Organisation,
-                    x.Reason);
+                    x.IsComplete);
             }
         }
 
