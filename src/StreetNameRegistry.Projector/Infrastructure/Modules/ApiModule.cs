@@ -22,6 +22,7 @@ namespace StreetNameRegistry.Projector.Infrastructure.Modules
     using StreetNameRegistry.Projections.LastChangedList;
     using StreetNameRegistry.Projections.Legacy;
     using StreetNameRegistry.Projections.Legacy.StreetNameDetail;
+    using StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream;
     using StreetNameRegistry.Projections.Legacy.StreetNameList;
     using StreetNameRegistry.Projections.Legacy.StreetNameName;
     using StreetNameRegistry.Projections.Legacy.StreetNameSyndication;
@@ -123,7 +124,8 @@ namespace StreetNameRegistry.Projector.Infrastructure.Modules
                 .RegisterProjections<StreetNameListProjections, LegacyContext>(ConnectedProjectionSettings.Default)
                 .RegisterProjections<StreetNameNameProjections, LegacyContext>(ConnectedProjectionSettings.Default)
                 .RegisterProjections<StreetNameSyndicationProjections, LegacyContext>(ConnectedProjectionSettings.Default)
-                .RegisterProjections<StreetNameVersionProjections, LegacyContext>(ConnectedProjectionSettings.Default);
+                .RegisterProjections<StreetNameVersionProjections, LegacyContext>(ConnectedProjectionSettings.Default)
+                .RegisterProjections<StreetNameLinkedDataEventStreamProjections, LegacyContext>(ConnectedProjectionSettings.Default);
         }
     }
 }

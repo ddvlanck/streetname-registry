@@ -4,6 +4,7 @@ namespace StreetNameRegistry.Projections.Legacy
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using StreetNameList;
+    using StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream;
     using StreetNameSyndication;
 
     public class LegacyContext : RunnerDbContext<LegacyContext>
@@ -18,6 +19,8 @@ namespace StreetNameRegistry.Projections.Legacy
         public DbSet<StreetNameSyndicationItem> StreetNameSyndication { get; set; }
 
         public DbSet<StreetNameListViewCount> StreetNameListViewCount { get; set; }
+
+        public DbSet<StreetNameLinkedDataEventStreamItem> StreetNameLinkedDataEventStream { get; set; }
 
         // This needs to be here to please EF
         public LegacyContext() { }
