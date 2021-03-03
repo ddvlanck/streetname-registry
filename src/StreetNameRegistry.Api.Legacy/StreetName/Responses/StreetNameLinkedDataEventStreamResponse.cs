@@ -31,7 +31,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
         [DataMember(Name = "tree:relation")]
         public List<HypermediaControls>? HypermediaControls { get; set; }
 
-        //TODO: add field for context
         [DataMember(Name = "items")]
         public List<StreetNameVersionObject> StreetNames { get; set; }
 

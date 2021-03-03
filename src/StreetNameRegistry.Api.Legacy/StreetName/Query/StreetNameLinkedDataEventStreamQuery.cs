@@ -4,6 +4,7 @@ using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
 using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using StreetNameRegistry.Projections.Legacy;
+using StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream;
 using StreetNameRegistry.Projections.Legacy.StreetNameSyndication;
 using System;
 using System.Collections.Generic;
@@ -18,11 +19,8 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         public long Position { get; }
         public string ChangeType { get; }
         public int PersistentLocalId { get; }
-
         public Instant RecordCreatedAt { get; }
-
         public string NisCode { get; }
-
         public string? NameDutch { get; }
         public string? NameEnglish { get; }
         public string? NameFrench { get; }
@@ -34,8 +32,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         public string? HomonymAdditionGerman { get; }
 
         public StreetNameStatus Status { get; set; }
-
-
 
         public StreetNameLinkedDataEventStreamQueryResult(
             long position,
@@ -73,7 +69,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         }
     }
 
-    public class StreetNameLinkedDataEventStreamQuery : Query<StreetNameSyndicationItem, StreetNameLDESFilter, StreetNameLinkedDataEventStreamQueryResult>
+    public class StreetNameLinkedDataEventStreamQuery : Query<StreetNameLinkedDataEventStreamItem, StreetNameLDESFilter, StreetNameLinkedDataEventStreamQueryResult>
     {
         private readonly LegacyContext _context;
 
@@ -84,7 +80,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
 
         protected override ISorting Sorting => new StreetNameLDESSorting();
 
-        protected override Expression<Func<StreetNameSyndicationItem, StreetNameLinkedDataEventStreamQueryResult>> Transformation
+        protected override Expression<Func<StreetNameLinkedDataEventStreamItem, StreetNameLinkedDataEventStreamQueryResult>> Transformation
         {
             get
             {
@@ -106,10 +102,10 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             }
         }
 
-        protected override IQueryable<StreetNameSyndicationItem> Filter(FilteringHeader<StreetNameLDESFilter> filtering)
+        protected override IQueryable<StreetNameLinkedDataEventStreamItem> Filter(FilteringHeader<StreetNameLDESFilter> filtering)
         {
             var streetNameSet = _context
-                .StreetNameSyndication
+                .StreetNameLinkedDataEventStream
                 .Where(x => x.IsComplete == true)
                 .OrderBy(x => x.Position)
                 .AsNoTracking();
@@ -122,10 +118,10 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
     {
         public IEnumerable<string> SortableFields { get; } = new[]
         {
-            nameof(StreetNameSyndicationItem.Position)
+            nameof(StreetNameLinkedDataEventStreamItem.Position)
         };
 
-        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(StreetNameSyndicationItem.Position), SortOrder.Ascending);
+        public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(StreetNameLinkedDataEventStreamItem.Position), SortOrder.Ascending);
     }
 
     public class StreetNameLDESFilter
