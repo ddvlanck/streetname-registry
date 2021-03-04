@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 {
     [DataContract(Name = "StreetNameLdesContext", Namespace = "")]
-    public class StreetNameLdesContext
+    public class StreetNameLinkedDataEventStreamContext
     {
         [DataMember(Name = "tree")]
         public readonly Uri HypermediaSpecificationUri = new Uri("https://w3id.org/tree#");
@@ -69,6 +69,12 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
         [DataMember(Name = "homoniemToevoeging")]
         public readonly string Homonyms = "adres:homoniemToevoeging";
+
+        [DataMember(Name = "tree:path")]
+        public readonly PropertyOverride TreePath = new PropertyOverride
+        {
+            Type = "@id"
+        };
     }
 
     public class TreeCollectionContext
@@ -78,7 +84,6 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
         [JsonProperty("@type")]
         public readonly string Type = "@id";
-
     }
 
     public class ProvenanceContext
@@ -101,8 +106,8 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
     public class PropertyOverride
     {
-        [JsonProperty("@id")]
-        public Uri Id { get; set; }
+        [JsonProperty("@id", NullValueHandling = NullValueHandling.Ignore)]
+        public Uri? Id { get; set; }
 
         [JsonProperty("@type")]
         public string Type { get; set; }

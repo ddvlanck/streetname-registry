@@ -2,6 +2,8 @@ using Be.Vlaanderen.Basisregisters.GrAr.Common;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using NodaTime;
+using StreetNameRegistry.Api.Legacy.Infrastructure;
+using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +16,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
     public class StreetNameLinkedDataEventStreamResponse
     {
         [DataMember(Name = "@context")]
-        public readonly object Context = new StreetNameLdesContext();
+        public readonly object Context = new StreetNameLinkedDataEventStreamContext();
 
         [DataMember(Name = "@id")]
         public Uri Id { get; set; }
@@ -29,12 +31,11 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
         public Uri StreetNameShape { get; set; }
 
         [DataMember(Name = "tree:relation")]
-        public List<HypermediaControls>? HypermediaControls { get; set; }
+        [JsonProperty(Required = Required.AllowNull, NullValueHandling = NullValueHandling.Ignore)]
+        public List<HypermediaControl>? HypermediaControls { get; set; }
 
         [DataMember(Name = "items")]
         public List<StreetNameVersionObject> StreetNames { get; set; }
-
-
     }
 
     [DataContract(Name = "StraatnaamVersieObject", Namespace = "")]
@@ -69,10 +70,30 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
         public Uri Status { get; set; }
 
         [IgnoreDataMember]
-        public IConfigurationSection _configuration { get; set; }
+        public LinkedDataEventStreamConfiguration Configuration { get; set; }
 
         public StreetNameVersionObject(
-            IConfigurationSection configuration,
+            LinkedDataEventStreamConfiguration configuration,
+            long position,
+            long persistentLocalId,
+            string changeType,
+            Instant generatedAtTime,
+            StreetNameStatus status,
+            string nisCode)
+        {
+            Configuration = configuration;
+            ChangeType = changeType;
+            GeneratedAtTime = generatedAtTime.ToBelgianDateTimeOffset();
+
+            Id = CreateVersionUri(position);
+            IsVersionOf = GetPersistentUri(persistentLocalId);
+            Status = GetStatusUri(status);
+
+            ResponsibleMunicipality = GetResponsibleMunicipality(nisCode);
+        }
+
+        public StreetNameVersionObject(
+            LinkedDataEventStreamConfiguration configuration,
             long position,
             long persistentLocalId,
             string changeType,
@@ -87,38 +108,27 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
             string? homonymAdditionFrench,
             string? homonymAdditionGerman,
             string? homonymAdditionEnglish)
+            : this (
+                  configuration,
+                  position,
+                  persistentLocalId,
+                  changeType,
+                  generatedAtTime,
+                  status,
+                  nisCode)
         {
-            _configuration = configuration;
-
-            ChangeType = changeType;
-            GeneratedAtTime = generatedAtTime.ToBelgianDateTimeOffset();
-
-            Id = CreateVersionUri(position);
-            IsVersionOf = GetPersistentUri(persistentLocalId);
-            Status = GetStatusUri(status);
-
             StreetNames = CreateListOfLanguageStrings(nameDutch, nameFrench, nameEnglish, nameGerman);
             Homonyms = CreateListOfLanguageStrings(homonymAdditionDutch, homonymAdditionFrench, homonymAdditionEnglish, homonymAdditionGerman);
-            ResponsibleMunicipality = GetResponsibleMunicipality(nisCode);
-
         }
 
-        private Uri CreateVersionUri(long position)
-        {
-            return new Uri($"{_configuration["ApiEndpoint"]}#{position}");
-        }
+        private Uri CreateVersionUri(long position) => new Uri($"{Configuration.ApiEndpoint}#{position}");
 
-        private Uri GetPersistentUri(long persistentLocalId)
-        {
-            return new Uri($"{_configuration["DataVlaanderenNamespace"]}/{persistentLocalId}");
-        }
+        private Uri GetPersistentUri(long persistentLocalId) => new Uri($"{Configuration.DataVlaanderenNamespace}/{persistentLocalId}");
 
         private Uri GetResponsibleMunicipality(string nisCode)
         {
             if (string.IsNullOrEmpty(nisCode))
-            {
                 throw new Exception("Received NisCode is null and can not be null");
-            }
 
             return new Uri($"https://data.vlaanderen.be/id/gemeente/{nisCode}");
         }
@@ -129,10 +139,13 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
             {
                 case StreetNameStatus.Current:
                     return new Uri("https://data.vlaanderen.be/id/concept/straatnaamstatus/inGebruik");
+
                 case StreetNameStatus.Proposed:
                     return new Uri("https://data.vlaanderen.be/id/concept/straatnaamstatus/voorgesteld");
+
                 case StreetNameStatus.Retired:
                     return new Uri("https://data.vlaanderen.be/id/concept/straatnaamstatus/gehistoreerd");
+
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -196,4 +209,49 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
         public string Language { get; set; }
     }
 
+    public class StreetNameLinkedDataEventStreamResponseExamples : IExamplesProvider<StreetNameLinkedDataEventStreamResponse>
+    {
+        private readonly LinkedDataEventStreamConfiguration _configuration;
+        public StreetNameLinkedDataEventStreamResponseExamples(LinkedDataEventStreamConfiguration configuration) => _configuration = configuration;
+        public StreetNameLinkedDataEventStreamResponse GetExamples()
+        {
+            var generatedAtTime = Instant.FromDateTimeOffset(DateTimeOffset.Parse("2002-11-21T11:23:45+01:00"));
+
+            var versionObjects = new List<StreetNameVersionObject>()
+            {
+                new StreetNameVersionObject(
+                    _configuration,
+                    8,
+                    83952,
+                    "StreetNameBecameComplete",
+                    generatedAtTime,
+                    StreetNameStatus.Current,
+                    "52043")
+            };
+
+            var hypermediaControls = new List<HypermediaControl>()
+            {
+                new HypermediaControl
+                {
+                    Type = "tree:GreaterThanOrEqualToRelation",
+                    Node = new Uri("https://data.vlaanderen.be/base/straatnamen?page=2"),
+                    SelectedProperty = "prov:generatedAtTime",
+                    TreeValue = new TreeValue
+                    {
+                        Value = DateTimeOffset.Parse("2002-11-21T11:23:45+01:00"),
+                        Type = "xsd:dateTime"
+                    }
+                }
+            };
+
+            return new StreetNameLinkedDataEventStreamResponse
+            {
+                Id = new Uri("https://data.vlaanderen.be/base/straatnamen?page=1"),
+                HypermediaControls = hypermediaControls,
+                CollectionLink = new Uri("https://data.vlaanderen.be/base/straatnamen"),
+                StreetNameShape = new Uri("https://data.vlaanderen.be/base/straatnamen/shape"),
+                StreetNames = versionObjects
+            };
+        }
+    }
 }

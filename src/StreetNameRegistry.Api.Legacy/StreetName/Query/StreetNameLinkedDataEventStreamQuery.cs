@@ -21,6 +21,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         public int PersistentLocalId { get; }
         public Instant RecordCreatedAt { get; }
         public string NisCode { get; }
+
         public string? NameDutch { get; }
         public string? NameEnglish { get; }
         public string? NameFrench { get; }
@@ -69,16 +70,13 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         }
     }
 
-    public class StreetNameLinkedDataEventStreamQuery : Query<StreetNameLinkedDataEventStreamItem, StreetNameLDESFilter, StreetNameLinkedDataEventStreamQueryResult>
+    public class StreetNameLinkedDataEventStreamQuery : Query<StreetNameLinkedDataEventStreamItem, StreetNameLinkedDataEventStreamFilter, StreetNameLinkedDataEventStreamQueryResult>
     {
         private readonly LegacyContext _context;
 
-        public StreetNameLinkedDataEventStreamQuery(LegacyContext context)
-        {
-            _context = context;
-        }
+        public StreetNameLinkedDataEventStreamQuery(LegacyContext context) => _context = context;
 
-        protected override ISorting Sorting => new StreetNameLDESSorting();
+        protected override ISorting Sorting => new StreetNameLinkedDataEventStreamSorting();
 
         protected override Expression<Func<StreetNameLinkedDataEventStreamItem, StreetNameLinkedDataEventStreamQueryResult>> Transformation
         {
@@ -102,19 +100,17 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             }
         }
 
-        protected override IQueryable<StreetNameLinkedDataEventStreamItem> Filter(FilteringHeader<StreetNameLDESFilter> filtering)
+        protected override IQueryable<StreetNameLinkedDataEventStreamItem> Filter(FilteringHeader<StreetNameLinkedDataEventStreamFilter> filtering)
         {
-            var streetNameSet = _context
+            return _context
                 .StreetNameLinkedDataEventStream
                 .Where(x => x.IsComplete == true)
                 .OrderBy(x => x.Position)
                 .AsNoTracking();
-
-            return streetNameSet;
         }
     }
 
-    internal class StreetNameLDESSorting : ISorting
+    internal class StreetNameLinkedDataEventStreamSorting : ISorting
     {
         public IEnumerable<string> SortableFields { get; } = new[]
         {
@@ -124,7 +120,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         public SortingHeader DefaultSortingHeader { get; } = new SortingHeader(nameof(StreetNameLinkedDataEventStreamItem.Position), SortOrder.Ascending);
     }
 
-    public class StreetNameLDESFilter
+    public class StreetNameLinkedDataEventStreamFilter
     {
         public int PageNumber { get; set; }
     }

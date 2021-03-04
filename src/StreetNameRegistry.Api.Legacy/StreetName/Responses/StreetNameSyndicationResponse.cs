@@ -35,6 +35,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
                 Id = streetName.Position.ToString(CultureInfo.InvariantCulture),
                 Title = $"{streetName.ChangeType}-{streetName.Position}",
                 Published = streetName.RecordCreatedAt.ToBelgianDateTimeOffset(),
+                LastUpdated = streetName.LastChangedOn.ToBelgianDateTimeOffset(),
                 Description = BuildDescription(streetName, responseOptions.Value.Naamruimte)
             };
 
@@ -66,7 +67,11 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
             item.AddCategory(
                 new SyndicationCategory(category));
 
-           
+            item.AddContributor(
+                new SyndicationPerson(
+                    streetName.Organisation == null ? Organisation.Unknown.ToName() : streetName.Organisation.Value.ToName(),
+                    string.Empty,
+                    AtomContributorTypes.Author));
 
             await writer.Write(item);
         }
@@ -93,14 +98,17 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
                     streetName.HomonymAdditionFrench,
                     streetName.HomonymAdditionGerman,
                     streetName.HomonymAdditionEnglish,
-                    streetName.IsComplete);
+                    streetName.IsComplete,
+                    streetName.LastChangedOn.ToBelgianDateTimeOffset(),
+                    streetName.Organisation,
+                    streetName.Reason);
 
-            /*if (streetName.ContainsEvent)
+            if (streetName.ContainsEvent)
             {
                 var doc = new XmlDocument();
                 doc.LoadXml(streetName.EventDataAsXml);
                 content.Event = doc.DocumentElement;
-            }*/
+            }
 
             return content.ToXml();
         }
@@ -181,11 +189,14 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
             string homonymAdditionFrench,
             string homonymAdditionGerman,
             string homonymAdditionEnglish,
-            bool isComplete)
+            bool isComplete,
+            DateTimeOffset version,
+            Organisation? organisation,
+            string reason)
         {
             StreetNameId = streetNameId;
             NisCode = nisCode;
-            //Identificator = new StraatnaamIdentificator(naamruimte, persistentLocalId?.ToString(CultureInfo.InvariantCulture), null);
+            Identificator = new StraatnaamIdentificator(naamruimte, persistentLocalId?.ToString(CultureInfo.InvariantCulture), version);
             StreetNameStatus = status?.ConvertFromStreetNameStatus();
             IsComplete = isComplete;
 
@@ -209,7 +220,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
             HomonymAdditions = homoniemToevoegingen.Where(x => !string.IsNullOrEmpty(x.Spelling)).ToList();
 
-            //Provenance = new Provenance(version, organisation, new Reason(reason));
+            Provenance = new Provenance(version, organisation, new Reason(reason));
         }
     }
 

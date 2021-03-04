@@ -1,4 +1,6 @@
 using Newtonsoft.Json;
+using StreetNameRegistry.Api.Legacy.Infrastructure;
+using Swashbuckle.AspNetCore.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -91,5 +93,18 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
         [JsonProperty(PropertyName = "sh:maxCount", NullValueHandling = NullValueHandling.Ignore)]
         public int? MaximumCount { get; set; }
+    }
+
+    public class StreetNameShaclShapeResponseExamples : IExamplesProvider<StreetNameShaclShapeResponse>
+    {
+        private readonly LinkedDataEventStreamConfiguration _configuration;
+        public StreetNameShaclShapeResponseExamples(LinkedDataEventStreamConfiguration configuration) => _configuration = configuration;
+        public StreetNameShaclShapeResponse GetExamples()
+        {
+            return new StreetNameShaclShapeResponse
+            {
+                Id = new Uri($"{_configuration.ApiEndpoint}/base")
+            };
+        }
     }
 }

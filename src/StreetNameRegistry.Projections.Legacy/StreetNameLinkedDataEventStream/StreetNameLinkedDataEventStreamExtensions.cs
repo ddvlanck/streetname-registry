@@ -51,9 +51,7 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
                    .OrderByDescending(x => x.Position)
                    .FirstOrDefaultAsync(ct);
 
-
         private static ProjectionItemNotFoundException<StreetNameLinkedDataEventStreamItem> DatabaseItemNotFound(Guid streetNameId)
            => new ProjectionItemNotFoundException<StreetNameLinkedDataEventStreamItem>(streetNameId.ToString("D"));
-
     }
 }

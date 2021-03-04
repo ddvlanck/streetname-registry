@@ -209,18 +209,6 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
                     x => { },
                     ct);
             });
-
-            When<Envelope<StreetNamePrimaryLanguageWasCleared>>(async (context, message, ct) => DoNothing());
-            When<Envelope<StreetNamePrimaryLanguageWasCorrected>>(async (context, message, ct) => DoNothing());
-            When<Envelope<StreetNamePrimaryLanguageWasCorrectedToCleared>>(async (context, message, ct) => DoNothing());
-            When<Envelope<StreetNamePrimaryLanguageWasDefined>>(async (context, message, ct) => DoNothing());
-            When<Envelope<StreetNameSecondaryLanguageWasCleared>>(async (context, message, ct) => DoNothing());
-            When<Envelope<StreetNameSecondaryLanguageWasCorrected>>(async (context, message, ct) => DoNothing());
-            When<Envelope<StreetNameSecondaryLanguageWasCorrectedToCleared>>(async (context, message, ct) => DoNothing());
-            When<Envelope<StreetNameSecondaryLanguageWasDefined>>(async (context, message, ct) => DoNothing());
-
-            When<Envelope<StreetNameWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
-            When<Envelope<StreetNameStatusWasImportedFromCrab>>(async (context, message, ct) => DoNothing());
         }
 
         private static void UpdateNameByLanguage(StreetNameLinkedDataEventStreamItem streetNameSyndicationItem, string name, Language? language)
@@ -260,7 +248,5 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
                     break;
             }
         }
-
-        private static void DoNothing() { }
     }
 }
