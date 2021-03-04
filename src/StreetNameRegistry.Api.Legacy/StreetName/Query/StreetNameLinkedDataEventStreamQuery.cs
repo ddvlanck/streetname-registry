@@ -1,19 +1,19 @@
-using Be.Vlaanderen.Basisregisters.Api.Search;
-using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
-using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
-using Microsoft.EntityFrameworkCore;
-using NodaTime;
-using StreetNameRegistry.Projections.Legacy;
-using StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream;
-using StreetNameRegistry.Projections.Legacy.StreetNameSyndication;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
-
 namespace StreetNameRegistry.Api.Legacy.StreetName.Query
 {
+    using Be.Vlaanderen.Basisregisters.Api.Search;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Filtering;
+    using Be.Vlaanderen.Basisregisters.Api.Search.Sorting;
+    using Microsoft.EntityFrameworkCore;
+    using NodaTime;
+    using StreetNameRegistry.Projections.Legacy;
+    using StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream;
+    using StreetNameRegistry.Projections.Legacy.StreetNameSyndication;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Threading.Tasks;
+
     public class StreetNameLinkedDataEventStreamQueryResult
     {
         public long Position { get; }
@@ -74,7 +74,8 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
     {
         private readonly LegacyContext _context;
 
-        public StreetNameLinkedDataEventStreamQuery(LegacyContext context) => _context = context;
+        public StreetNameLinkedDataEventStreamQuery(LegacyContext context)
+            => _context = context;
 
         protected override ISorting Sorting => new StreetNameLinkedDataEventStreamSorting();
 
@@ -101,13 +102,11 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         }
 
         protected override IQueryable<StreetNameLinkedDataEventStreamItem> Filter(FilteringHeader<StreetNameLinkedDataEventStreamFilter> filtering)
-        {
-            return _context
+            => _context
                 .StreetNameLinkedDataEventStream
                 .Where(x => x.IsComplete == true)
                 .OrderBy(x => x.Position)
                 .AsNoTracking();
-        }
     }
 
     internal class StreetNameLinkedDataEventStreamSorting : ISorting

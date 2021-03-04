@@ -1,15 +1,15 @@
-using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
-using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
-using StreetNameRegistry.StreetName.Events;
-using StreetNameRegistry.StreetName.Events.Crab;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
 {
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
+    using StreetNameRegistry.StreetName.Events;
+    using StreetNameRegistry.StreetName.Events.Crab;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
     public class StreetNameLinkedDataEventStreamProjections : ConnectedProjection<LegacyContext>
     {
         public StreetNameLinkedDataEventStreamProjections()

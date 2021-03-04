@@ -1,16 +1,16 @@
-using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using NodaTime;
-using StreetNameRegistry.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
 {
+    using Be.Vlaanderen.Basisregisters.ProjectionHandling.Runner.MigrationExtensions;
+    using Microsoft.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore.Metadata.Builders;
+    using NodaTime;
+    using StreetNameRegistry.Infrastructure;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
+
     public class StreetNameLinkedDataEventStreamItem
     {
         public long Position { get; set; }
@@ -78,6 +78,7 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
     public class StreetNameLinkedDataEventStreamConfiguration : IEntityTypeConfiguration<StreetNameLinkedDataEventStreamItem>
     {
         private const string TableName = "StreetNameLinkedDataEventStream";
+
         public void Configure(EntityTypeBuilder<StreetNameLinkedDataEventStreamItem> builder)
         {
             builder.ToTable(TableName, Schema.Legacy)

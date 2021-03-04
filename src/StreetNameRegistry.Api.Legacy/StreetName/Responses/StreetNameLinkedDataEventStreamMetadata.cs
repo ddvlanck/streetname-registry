@@ -1,18 +1,20 @@
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using StreetNameRegistry.Api.Legacy.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
 namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 {
+    using Microsoft.Extensions.Configuration;
+    using Newtonsoft.Json;
+    using StreetNameRegistry.Api.Legacy.Infrastructure;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Threading.Tasks;
+
     public class StreetNameLinkedDataEventStreamMetadata
     {
-        public static Uri GetPageIdentifier(LinkedDataEventStreamConfiguration configuration, int page) => new Uri($"{configuration.ApiEndpoint}?page={page}");
+        public static Uri GetPageIdentifier(LinkedDataEventStreamConfiguration configuration, int page)
+            => new Uri($"{configuration.ApiEndpoint}?page={page}");
 
-        public static Uri GetCollectionLink(LinkedDataEventStreamConfiguration configuration) => new Uri($"{configuration.ApiEndpoint}");
+        public static Uri GetCollectionLink(LinkedDataEventStreamConfiguration configuration)
+            => new Uri($"{configuration.ApiEndpoint}");
 
         public static List<HypermediaControl>? GetHypermediaControls(List<StreetNameVersionObject> items, LinkedDataEventStreamConfiguration configuration, int page, int pageSize)
         {

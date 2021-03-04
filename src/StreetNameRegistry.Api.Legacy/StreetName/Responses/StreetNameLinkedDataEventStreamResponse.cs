@@ -1,17 +1,17 @@
-using Be.Vlaanderen.Basisregisters.GrAr.Common;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using NodaTime;
-using StreetNameRegistry.Api.Legacy.Infrastructure;
-using Swashbuckle.AspNetCore.Filters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
-using System.Threading.Tasks;
-
 namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 {
+    using Be.Vlaanderen.Basisregisters.GrAr.Common;
+    using Microsoft.Extensions.Configuration;
+    using Newtonsoft.Json;
+    using NodaTime;
+    using StreetNameRegistry.Api.Legacy.Infrastructure;
+    using Swashbuckle.AspNetCore.Filters;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Runtime.Serialization;
+    using System.Threading.Tasks;
+
     [DataContract(Name = "StreetNameLinkedDataEventStream", Namespace = "")]
     public class StreetNameLinkedDataEventStreamResponse
     {
@@ -121,9 +121,11 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
             Homonyms = CreateListOfLanguageStrings(homonymAdditionDutch, homonymAdditionFrench, homonymAdditionEnglish, homonymAdditionGerman);
         }
 
-        private Uri CreateVersionUri(long position) => new Uri($"{Configuration.ApiEndpoint}#{position}");
+        private Uri CreateVersionUri(long position)
+            => new Uri($"{Configuration.ApiEndpoint}#{position}");
 
-        private Uri GetPersistentUri(long persistentLocalId) => new Uri($"{Configuration.DataVlaanderenNamespace}/{persistentLocalId}");
+        private Uri GetPersistentUri(long persistentLocalId)
+            => new Uri($"{Configuration.DataVlaanderenNamespace}/{persistentLocalId}");
 
         private Uri GetResponsibleMunicipality(string nisCode)
         {
@@ -212,7 +214,9 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
     public class StreetNameLinkedDataEventStreamResponseExamples : IExamplesProvider<StreetNameLinkedDataEventStreamResponse>
     {
         private readonly LinkedDataEventStreamConfiguration _configuration;
+
         public StreetNameLinkedDataEventStreamResponseExamples(LinkedDataEventStreamConfiguration configuration) => _configuration = configuration;
+
         public StreetNameLinkedDataEventStreamResponse GetExamples()
         {
             var generatedAtTime = Instant.FromDateTimeOffset(DateTimeOffset.Parse("2002-11-21T11:23:45+01:00"));
