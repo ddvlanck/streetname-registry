@@ -4,9 +4,11 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.Connector;
     using Be.Vlaanderen.Basisregisters.ProjectionHandling.SqlStreamStore;
     using Microsoft.EntityFrameworkCore;
+    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Security.Cryptography;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -25,10 +27,15 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
             if (streetNameLinkedDataEventStreamItem == null)
                 throw DatabaseItemNotFound(streetNameId);
 
+            var provenance = message.Message.Provenance;
+
             var newItem = streetNameLinkedDataEventStreamItem.CloneAndApplyEventInfo(
                 message.Position,
                 message.EventName,
+                provenance.Timestamp,
                 applyEventInfoOn);
+
+            newItem.SetObjectHash();
 
             await context
                 .StreetNameLinkedDataEventStream
@@ -53,5 +60,14 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
 
         private static ProjectionItemNotFoundException<StreetNameLinkedDataEventStreamItem> DatabaseItemNotFound(Guid streetNameId)
            => new ProjectionItemNotFoundException<StreetNameLinkedDataEventStreamItem>(streetNameId.ToString("D"));
+
+        public static void SetObjectHash(this StreetNameLinkedDataEventStreamItem linkedDataEventStreamItem)
+        {
+            var objectString = JsonConvert.SerializeObject(linkedDataEventStreamItem);
+
+            using var md5Hash = MD5.Create();
+            var hashBytes = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(objectString));
+            linkedDataEventStreamItem.ObjectHash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
+        }
     }
 }

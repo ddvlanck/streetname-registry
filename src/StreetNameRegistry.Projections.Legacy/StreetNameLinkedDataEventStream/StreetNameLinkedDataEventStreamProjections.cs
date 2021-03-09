@@ -21,9 +21,11 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
                     Position = message.Position,
                     StreetNameId = message.Message.StreetNameId,
                     NisCode = message.Message.NisCode,
-                    RecordCreatedAt = message.Message.Provenance.Timestamp,
+                    EventGeneratedAtTime = message.Message.Provenance.Timestamp,
                     ChangeType = message.EventName
                 };
+
+                streetNameLinkedDataEventStreamItem.SetObjectHash();
 
                 await context
                     .StreetNameLinkedDataEventStream

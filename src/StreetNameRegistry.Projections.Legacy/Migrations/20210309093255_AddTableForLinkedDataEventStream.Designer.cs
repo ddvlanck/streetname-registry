@@ -10,7 +10,7 @@ using StreetNameRegistry.Projections.Legacy;
 namespace StreetNameRegistry.Projections.Legacy.Migrations
 {
     [DbContext(typeof(LegacyContext))]
-    [Migration("20210303142005_AddTableForLinkedDataEventStream")]
+    [Migration("20210309093255_AddTableForLinkedDataEventStream")]
     partial class AddTableForLinkedDataEventStream
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -112,6 +112,10 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
                     b.Property<string>("ChangeType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset>("EventGeneratedAtTimeAsDateTimeOffset")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("RecordCreatedAt");
+
                     b.Property<string>("HomonymAdditionDutch")
                         .HasColumnType("nvarchar(max)");
 
@@ -142,12 +146,13 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
                     b.Property<string>("NisCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ObjectHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ObjectIdentifier");
+
                     b.Property<int?>("PersistentLocalId")
                         .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("RecordCreatedAtAsDateTimeOffset")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("RecordCreatedAt");
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");

@@ -373,7 +373,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(StreetNameLinkedDataEventStreamResponse))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> LinkedDataEventStream(
-           [FromServices] IConfiguration configuration,
+           [FromServices] LinkedDataEventStreamConfiguration configuration,
            [FromServices] LegacyContext context,
            [FromServices] IOptions<ResponseOptions> responseOptions,
            CancellationToken cancellationToken = default)
@@ -391,14 +391,12 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
                 new StreetNameLinkedDataEventStreamQuery(context)
                 .Fetch(filtering, sorting, pagination);
 
-            var linkedDataEventStreamConfiguration = new LinkedDataEventStreamConfiguration(configuration.GetSection("LinkedDataEventStream"));
-
             var streetNameVersionObjects =
                 streetNamesPaged
                 .Items
                 .Select(x => new StreetNameVersionObject(
-                    linkedDataEventStreamConfiguration,
-                    x.Position,
+                    configuration,
+                    x.ObjectIdentifier,
                     x.PersistentLocalId,
                     x.ChangeType,
                     x.RecordCreatedAt,
@@ -416,10 +414,10 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
 
             return Ok(new StreetNameLinkedDataEventStreamResponse
             {
-                Id = StreetNameLinkedDataEventStreamMetadata.GetPageIdentifier(linkedDataEventStreamConfiguration, page),
-                CollectionLink = StreetNameLinkedDataEventStreamMetadata.GetCollectionLink(linkedDataEventStreamConfiguration),
-                StreetNameShape = new Uri($"{linkedDataEventStreamConfiguration.ApiEndpoint}/shape"),
-                HypermediaControls = StreetNameLinkedDataEventStreamMetadata.GetHypermediaControls(streetNameVersionObjects, linkedDataEventStreamConfiguration, page, pageSize),
+                Id = StreetNameLinkedDataEventStreamMetadata.GetPageIdentifier(configuration, page),
+                CollectionLink = StreetNameLinkedDataEventStreamMetadata.GetCollectionLink(configuration),
+                StreetNameShape = new Uri($"{configuration.ApiEndpoint}/shape"),
+                HypermediaControls = StreetNameLinkedDataEventStreamMetadata.GetHypermediaControls(streetNameVersionObjects, configuration, page, pageSize),
                 StreetNames = streetNameVersionObjects
             });
         }
@@ -439,16 +437,14 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
         [SwaggerResponseExample(StatusCodes.Status200OK, typeof(StreetNameShaclShapeResponseExamples))]
         [SwaggerResponseExample(StatusCodes.Status500InternalServerError, typeof(InternalServerErrorResponseExamples))]
         public async Task<IActionResult> Shape(
-            [FromServices] IConfiguration configuration,
+            [FromServices] LinkedDataEventStreamConfiguration configuration,
             [FromServices] LegacyContext context,
             [FromServices] IOptions<ResponseOptions> responseOptions,
             CancellationToken cancellationToken = default)
         {
-            var linkedDataEventStreamConfiguration = new LinkedDataEventStreamConfiguration(configuration.GetSection("LinkedDataEventStream"));
-
             return Ok(new StreetNameShaclShapeResponse
             {
-                Id = new Uri($"{linkedDataEventStreamConfiguration.ApiEndpoint}/shape")
+                Id = new Uri($"{configuration.ApiEndpoint}/shape")
             });
         }
 

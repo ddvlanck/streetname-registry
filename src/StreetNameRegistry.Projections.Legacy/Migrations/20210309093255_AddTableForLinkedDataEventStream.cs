@@ -27,7 +27,8 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
                     HomonymAdditionGerman = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: true),
                     IsComplete = table.Column<bool>(type: "bit", nullable: false),
-                    RecordCreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    RecordCreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    ObjectIdentifier = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

@@ -31,17 +31,20 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
 
         public StreetNameStatus? Status { get; set; }
         public bool IsComplete { get; set; }
-        public DateTimeOffset RecordCreatedAtAsDateTimeOffset { get; set; }
+        public DateTimeOffset EventGeneratedAtTimeAsDateTimeOffset { get; set; }
 
-        public Instant RecordCreatedAt
+        public Instant EventGeneratedAtTime
         {
-            get => Instant.FromDateTimeOffset(RecordCreatedAtAsDateTimeOffset);
-            set => RecordCreatedAtAsDateTimeOffset = value.ToDateTimeOffset();
+            get => Instant.FromDateTimeOffset(EventGeneratedAtTimeAsDateTimeOffset);
+            set => EventGeneratedAtTimeAsDateTimeOffset = value.ToDateTimeOffset();
         }
+
+        public string ObjectHash { get; set; }
 
         public StreetNameLinkedDataEventStreamItem CloneAndApplyEventInfo(
             long newPosition,
             string eventName,
+            Instant generatedAtTime,
             Action<StreetNameLinkedDataEventStreamItem> editFunc)
         {
             var newItem = new StreetNameLinkedDataEventStreamItem
@@ -66,7 +69,7 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
 
                 Status = Status,
                 IsComplete = IsComplete,
-                RecordCreatedAt = RecordCreatedAt
+                EventGeneratedAtTime = generatedAtTime
             };
 
             editFunc(newItem);
@@ -105,9 +108,10 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
             builder.Property(x => x.Status);
             builder.Property(x => x.IsComplete);
 
-            builder.Property(x => x.RecordCreatedAtAsDateTimeOffset).HasColumnName("RecordCreatedAt");
+            builder.Property(x => x.EventGeneratedAtTimeAsDateTimeOffset).HasColumnName("RecordCreatedAt");
+            builder.Property(x => x.ObjectHash).HasColumnName("ObjectIdentifier");
 
-            builder.Ignore(x => x.RecordCreatedAt);
+            builder.Ignore(x => x.EventGeneratedAtTime);
 
             builder.HasIndex(x => x.StreetNameId);
         }

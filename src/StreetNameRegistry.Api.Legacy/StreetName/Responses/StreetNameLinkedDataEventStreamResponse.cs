@@ -70,22 +70,22 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
         public Uri Status { get; set; }
 
         [IgnoreDataMember]
-        public LinkedDataEventStreamConfiguration Configuration { get; set; }
+        public LinkedDataEventStreamConfiguration _configuration { get; set; }
 
         public StreetNameVersionObject(
             LinkedDataEventStreamConfiguration configuration,
-            long position,
+            string objectIdentifier,
             long persistentLocalId,
             string changeType,
             Instant generatedAtTime,
             StreetNameStatus status,
             string nisCode)
         {
-            Configuration = configuration;
+            _configuration = configuration;
             ChangeType = changeType;
             GeneratedAtTime = generatedAtTime.ToBelgianDateTimeOffset();
 
-            Id = CreateVersionUri(position);
+            Id = CreateVersionUri(objectIdentifier);
             IsVersionOf = GetPersistentUri(persistentLocalId);
             Status = GetStatusUri(status);
 
@@ -94,7 +94,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
         public StreetNameVersionObject(
             LinkedDataEventStreamConfiguration configuration,
-            long position,
+            string objectIdentifier,
             long persistentLocalId,
             string changeType,
             Instant generatedAtTime,
@@ -110,7 +110,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
             string? homonymAdditionEnglish)
             : this (
                   configuration,
-                  position,
+                  objectIdentifier,
                   persistentLocalId,
                   changeType,
                   generatedAtTime,
@@ -121,11 +121,11 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
             Homonyms = CreateListOfLanguageStrings(homonymAdditionDutch, homonymAdditionFrench, homonymAdditionEnglish, homonymAdditionGerman);
         }
 
-        private Uri CreateVersionUri(long position)
-            => new Uri($"{Configuration.ApiEndpoint}#{position}");
+        private Uri CreateVersionUri(string identifier)
+            => new Uri($"{_configuration.ApiEndpoint}#{identifier}");
 
         private Uri GetPersistentUri(long persistentLocalId)
-            => new Uri($"{Configuration.DataVlaanderenNamespace}/{persistentLocalId}");
+            => new Uri($"{_configuration.DataVlaanderenNamespace}/{persistentLocalId}");
 
         private Uri GetResponsibleMunicipality(string nisCode)
         {
@@ -225,7 +225,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
             {
                 new StreetNameVersionObject(
                     _configuration,
-                    8,
+                    "ED45646",
                     83952,
                     "StreetNameBecameComplete",
                     generatedAtTime,

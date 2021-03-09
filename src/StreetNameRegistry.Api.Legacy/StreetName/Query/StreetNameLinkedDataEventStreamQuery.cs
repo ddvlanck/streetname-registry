@@ -16,7 +16,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
 
     public class StreetNameLinkedDataEventStreamQueryResult
     {
-        public long Position { get; }
+        public string ObjectIdentifier { get; }
         public string ChangeType { get; }
         public int PersistentLocalId { get; }
         public Instant RecordCreatedAt { get; }
@@ -35,7 +35,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         public StreetNameStatus Status { get; set; }
 
         public StreetNameLinkedDataEventStreamQueryResult(
-            long position,
+            string objectIdentifier,
             string changeType,
             int persistentLocalId,
             Instant recordCreatedAt,
@@ -50,7 +50,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             string? homonymAdditionGerman,
             string? homonymAdditionEnglish)
         {
-            Position = position;
+            ObjectIdentifier = objectIdentifier;
             ChangeType = changeType;
             NisCode = nisCode;
             PersistentLocalId = persistentLocalId;
@@ -84,10 +84,10 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             get
             {
                 return syndicationItem => new StreetNameLinkedDataEventStreamQueryResult(
-                    syndicationItem.Position,
+                    syndicationItem.ObjectHash,
                     syndicationItem.ChangeType,
                     (int)syndicationItem.PersistentLocalId,
-                    syndicationItem.RecordCreatedAt,
+                    syndicationItem.EventGeneratedAtTime,
                     syndicationItem.NisCode,
                     (StreetNameStatus)syndicationItem.Status,
                     syndicationItem.NameDutch,

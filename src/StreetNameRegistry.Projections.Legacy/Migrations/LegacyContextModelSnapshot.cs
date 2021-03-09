@@ -110,6 +110,10 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
                     b.Property<string>("ChangeType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset>("EventGeneratedAtTimeAsDateTimeOffset")
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("RecordCreatedAt");
+
                     b.Property<string>("HomonymAdditionDutch")
                         .HasColumnType("nvarchar(max)");
 
@@ -140,12 +144,13 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
                     b.Property<string>("NisCode")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("ObjectHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ObjectIdentifier");
+
                     b.Property<int?>("PersistentLocalId")
                         .HasColumnType("int");
-
-                    b.Property<DateTimeOffset>("RecordCreatedAtAsDateTimeOffset")
-                        .HasColumnType("datetimeoffset")
-                        .HasColumnName("RecordCreatedAt");
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");
