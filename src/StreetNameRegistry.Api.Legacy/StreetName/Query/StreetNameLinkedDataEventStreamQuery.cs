@@ -19,7 +19,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         public string ObjectIdentifier { get; }
         public string ChangeType { get; }
         public int PersistentLocalId { get; }
-        public Instant RecordCreatedAt { get; }
+        public Instant EventGeneratedAtTime { get; }
         public string NisCode { get; }
 
         public string? NameDutch { get; }
@@ -38,7 +38,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             string objectIdentifier,
             string changeType,
             int persistentLocalId,
-            Instant recordCreatedAt,
+            Instant eventGeneratedAtTime,
             string nisCode,
             StreetNameStatus status,
             string? nameDutch,
@@ -56,7 +56,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
             PersistentLocalId = persistentLocalId;
             Status = status;
 
-            RecordCreatedAt = recordCreatedAt;
+            EventGeneratedAtTime = eventGeneratedAtTime;
 
             NameDutch = nameDutch;
             NameFrench = nameFrench;
@@ -104,7 +104,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Query
         protected override IQueryable<StreetNameLinkedDataEventStreamItem> Filter(FilteringHeader<StreetNameLinkedDataEventStreamFilter> filtering)
             => _context
                 .StreetNameLinkedDataEventStream
-                .Where(x => x.IsComplete == true)
+                .Where(x => x.RecordCanBePublished == true)
                 .OrderBy(x => x.Position)
                 .AsNoTracking();
     }

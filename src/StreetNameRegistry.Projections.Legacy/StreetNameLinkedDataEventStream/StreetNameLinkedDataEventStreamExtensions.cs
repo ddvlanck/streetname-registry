@@ -36,6 +36,7 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
                 applyEventInfoOn);
 
             newItem.SetObjectHash();
+            newItem.CheckIfRecordCanBePublished();
 
             await context
                 .StreetNameLinkedDataEventStream
@@ -58,8 +59,65 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
                    .OrderByDescending(x => x.Position)
                    .FirstOrDefaultAsync(ct);
 
-        private static ProjectionItemNotFoundException<StreetNameLinkedDataEventStreamItem> DatabaseItemNotFound(Guid streetNameId)
-           => new ProjectionItemNotFoundException<StreetNameLinkedDataEventStreamItem>(streetNameId.ToString("D"));
+        public static async Task UpdatePersistentLocalIdentifier(
+            this LegacyContext context,
+            Guid streetNameId,
+            int persistentLocalid,
+            CancellationToken ct)
+        {
+            var streetNameItems = context
+                    .StreetNameLinkedDataEventStream
+                    .Local
+                    .Where(x => x.StreetNameId == streetNameId).ToList()
+                ?? await context
+                    .StreetNameLinkedDataEventStream
+                    .Where(x => x.StreetNameId == streetNameId)
+                    .ToListAsync(ct);
+
+            foreach (var item in streetNameItems)
+                item.PersistentLocalId = persistentLocalid;
+
+            await context.SaveChangesAsync();
+        }
+
+        public static async Task StreetNameWasRemoved(
+            this LegacyContext context,
+            Guid streetNameId,
+            CancellationToken ct)
+        {
+            var streetNameItems = context
+                    .StreetNameLinkedDataEventStream
+                    .Local
+                    .Where(x => x.StreetNameId == streetNameId).ToList()
+                ?? await context
+                    .StreetNameLinkedDataEventStream
+                    .Where(x => x.StreetNameId == streetNameId)
+                    .ToListAsync(ct);
+
+            foreach (var item in streetNameItems)
+                item.RecordCanBePublished = false;
+
+            await context.SaveChangesAsync();
+        }
+
+        public static void CheckIfRecordCanBePublished(this StreetNameLinkedDataEventStreamItem streetNameLinkedDataEventStreamItem)
+        {
+            var recordCanBePublished = true;
+
+            if (string.IsNullOrEmpty(streetNameLinkedDataEventStreamItem.NameDutch)
+                && string.IsNullOrEmpty(streetNameLinkedDataEventStreamItem.NameEnglish)
+                && string.IsNullOrEmpty(streetNameLinkedDataEventStreamItem.NameFrench)
+                && string.IsNullOrEmpty(streetNameLinkedDataEventStreamItem.NameGerman))
+                recordCanBePublished = false;
+
+            if (string.IsNullOrEmpty(streetNameLinkedDataEventStreamItem.NisCode))
+                recordCanBePublished = false;
+
+            if (streetNameLinkedDataEventStreamItem.Status == null)
+                recordCanBePublished = false;
+
+            streetNameLinkedDataEventStreamItem.RecordCanBePublished = recordCanBePublished;
+        }
 
         public static void SetObjectHash(this StreetNameLinkedDataEventStreamItem linkedDataEventStreamItem)
         {
@@ -69,5 +127,8 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
             var hashBytes = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(objectString));
             linkedDataEventStreamItem.ObjectHash = BitConverter.ToString(hashBytes).Replace("-", string.Empty);
         }
+
+        private static ProjectionItemNotFoundException<StreetNameLinkedDataEventStreamItem> DatabaseItemNotFound(Guid streetNameId)
+   => new ProjectionItemNotFoundException<StreetNameLinkedDataEventStreamItem>(streetNameId.ToString("D"));
     }
 }

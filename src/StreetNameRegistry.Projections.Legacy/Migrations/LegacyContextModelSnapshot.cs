@@ -112,7 +112,7 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
 
                     b.Property<DateTimeOffset>("EventGeneratedAtTimeAsDateTimeOffset")
                         .HasColumnType("datetimeoffset")
-                        .HasColumnName("RecordCreatedAt");
+                        .HasColumnName("EventGeneratedAtTime");
 
                     b.Property<string>("HomonymAdditionDutch")
                         .HasColumnType("nvarchar(max)");
@@ -125,9 +125,6 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
 
                     b.Property<string>("HomonymAdditionGerman")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsComplete")
-                        .HasColumnType("bit");
 
                     b.Property<string>("NameDutch")
                         .HasColumnType("nvarchar(max)");
@@ -151,6 +148,9 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
 
                     b.Property<int?>("PersistentLocalId")
                         .HasColumnType("int");
+
+                    b.Property<bool>("RecordCanBePublished")
+                        .HasColumnType("bit");
 
                     b.Property<int?>("Status")
                         .HasColumnType("int");

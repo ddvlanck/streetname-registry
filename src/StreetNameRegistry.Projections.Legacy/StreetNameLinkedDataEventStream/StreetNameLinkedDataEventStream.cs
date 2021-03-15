@@ -30,7 +30,6 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
         public string? HomonymAdditionGerman { get; set; }
 
         public StreetNameStatus? Status { get; set; }
-        public bool IsComplete { get; set; }
         public DateTimeOffset EventGeneratedAtTimeAsDateTimeOffset { get; set; }
 
         public Instant EventGeneratedAtTime
@@ -40,6 +39,8 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
         }
 
         public string ObjectHash { get; set; }
+
+        public Boolean RecordCanBePublished { get; set; }
 
         public StreetNameLinkedDataEventStreamItem CloneAndApplyEventInfo(
             long newPosition,
@@ -68,7 +69,7 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
                 HomonymAdditionGerman = HomonymAdditionGerman,
 
                 Status = Status,
-                IsComplete = IsComplete,
+                RecordCanBePublished = RecordCanBePublished,
                 EventGeneratedAtTime = generatedAtTime
             };
 
@@ -106,9 +107,9 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
             builder.Property(x => x.HomonymAdditionEnglish);
 
             builder.Property(x => x.Status);
-            builder.Property(x => x.IsComplete);
+            builder.Property(x => x.RecordCanBePublished);
 
-            builder.Property(x => x.EventGeneratedAtTimeAsDateTimeOffset).HasColumnName("RecordCreatedAt");
+            builder.Property(x => x.EventGeneratedAtTimeAsDateTimeOffset).HasColumnName("EventGeneratedAtTime");
             builder.Property(x => x.ObjectHash).HasColumnName("ObjectIdentifier");
 
             builder.Ignore(x => x.EventGeneratedAtTime);

@@ -26,6 +26,7 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
                 };
 
                 streetNameLinkedDataEventStreamItem.SetObjectHash();
+                streetNameLinkedDataEventStreamItem.CheckIfRecordCanBePublished();
 
                 await context
                     .StreetNameLinkedDataEventStream
@@ -34,10 +35,9 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
 
             When<Envelope<StreetNamePersistentLocalIdWasAssigned>>(async (context, message, ct) =>
             {
-                await context.CreateNewStreetNameLinkedDataEventStreamItem(
+                await context.UpdatePersistentLocalIdentifier(
                     message.Message.StreetNameId,
-                    message,
-                    x => x.PersistentLocalId = message.Message.PersistentLocalId,
+                    message.Message.PersistentLocalId,
                     ct);
             });
 
@@ -187,28 +187,26 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
 
             When<Envelope<StreetNameBecameComplete>>(async (context, message, ct) =>
             {
-                await context.CreateNewStreetNameLinkedDataEventStreamItem(
+                /*await context.CreateNewStreetNameLinkedDataEventStreamItem(
                     message.Message.StreetNameId,
                     message,
                     x => x.IsComplete = true,
-                    ct);
+                    ct);*/
             });
 
             When<Envelope<StreetNameBecameIncomplete>>(async (context, message, ct) =>
             {
-                await context.CreateNewStreetNameLinkedDataEventStreamItem(
+                /*await context.CreateNewStreetNameLinkedDataEventStreamItem(
                     message.Message.StreetNameId,
                     message,
                     x => x.IsComplete = false,
-                    ct);
+                    ct);*/
             });
 
             When<Envelope<StreetNameWasRemoved>>(async (context, message, ct) =>
             {
-                await context.CreateNewStreetNameLinkedDataEventStreamItem(
+                await context.StreetNameWasRemoved(
                     message.Message.StreetNameId,
-                    message,
-                    x => { },
                     ct);
             });
         }

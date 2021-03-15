@@ -391,6 +391,8 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
                 new StreetNameLinkedDataEventStreamQuery(context)
                 .Fetch(filtering, sorting, pagination);
 
+            Console.WriteLine(streetNamesPaged);
+
             var streetNameVersionObjects =
                 streetNamesPaged
                 .Items
@@ -399,7 +401,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
                     x.ObjectIdentifier,
                     x.PersistentLocalId,
                     x.ChangeType,
-                    x.RecordCreatedAt,
+                    x.EventGeneratedAtTime,
                     x.Status,
                     x.NisCode,
                     x.NameDutch,
@@ -416,7 +418,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName
             {
                 Id = StreetNameLinkedDataEventStreamMetadata.GetPageIdentifier(configuration, page),
                 CollectionLink = StreetNameLinkedDataEventStreamMetadata.GetCollectionLink(configuration),
-                StreetNameShape = new Uri($"{configuration.ApiEndpoint}/shape"),
+                StreetNameShape = StreetNameLinkedDataEventStreamMetadata.GetShapeUri(configuration),
                 HypermediaControls = StreetNameLinkedDataEventStreamMetadata.GetHypermediaControls(streetNameVersionObjects, configuration, page, pageSize),
                 StreetNames = streetNameVersionObjects
             });
