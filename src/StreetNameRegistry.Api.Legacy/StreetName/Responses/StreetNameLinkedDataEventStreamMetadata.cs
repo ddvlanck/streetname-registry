@@ -43,14 +43,8 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
             return new HypermediaControl
             {
-                Type = "tree:LessThanOrEqualToRelation",
-                Node = previousUrl,
-                SelectedProperty = "prov:generatedAtTime",
-                TreeValue = new TreeValue
-                {
-                    Value = items.FirstOrDefault().GeneratedAtTime,
-                    Type = "xsd:dateTime"
-                }
+                Type = "tree:Relation",
+                Node = previousUrl
             };
         }
 
@@ -63,14 +57,8 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
             return new HypermediaControl
             {
-                Type = "tree:GreaterThanOrEqualToRelation",
-                Node = nextUrl,
-                SelectedProperty = "prov:generatedAtTime",
-                TreeValue = new TreeValue
-                {
-                    Value = items[items.Count - 1].GeneratedAtTime,
-                    Type = "xsd:dateTime"
-                }
+                Type = "tree:Relation",
+                Node = nextUrl
             };
         }
     }
@@ -82,20 +70,7 @@ namespace StreetNameRegistry.Api.Legacy.StreetName.Responses
 
         [JsonProperty("tree:node")]
         public Uri Node { get; set; }
-
-        [JsonProperty("tree:path")]
-        public string SelectedProperty { get; set; }
-
-        [JsonProperty("tree:value")]
-        public TreeValue TreeValue { get; set; }
-    }
-
-    public class TreeValue
-    {
-        [JsonProperty("@value")]
-        public DateTimeOffset Value { get; set; }
-
-        [JsonProperty("@type")]
-        public string Type { get; set; }
     }
 }
+
+
