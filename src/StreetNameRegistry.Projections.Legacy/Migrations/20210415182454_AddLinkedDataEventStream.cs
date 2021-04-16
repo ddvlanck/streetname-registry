@@ -3,13 +3,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace StreetNameRegistry.Projections.Legacy.Migrations
 {
-    public partial class AddTableForLinkedDataEventStream : Migration
+    public partial class AddLinkedDataEventStream : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.EnsureSchema(
+                name: "StreetNameRegistryLdes");
+
             migrationBuilder.CreateTable(
-                name: "StreetNameLinkedDataEventStream",
-                schema: "StreetNameRegistryLegacy",
+                name: "StreetName",
+                schema: "StreetNameRegistryLdes",
                 columns: table => new
                 {
                     Position = table.Column<long>(type: "bigint", nullable: false),
@@ -32,28 +35,28 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StreetNameLinkedDataEventStream", x => x.Position)
+                    table.PrimaryKey("PK_StreetName", x => x.Position)
                         .Annotation("SqlServer:Clustered", true);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "CI_StreetNameLinkedDataEventStream_Position",
-                schema: "StreetNameRegistryLegacy",
-                table: "StreetNameLinkedDataEventStream",
+                name: "CI_StreetName_Position",
+                schema: "StreetNameRegistryLdes",
+                table: "StreetName",
                 column: "Position");
 
             migrationBuilder.CreateIndex(
-                name: "IX_StreetNameLinkedDataEventStream_StreetNameId",
-                schema: "StreetNameRegistryLegacy",
-                table: "StreetNameLinkedDataEventStream",
+                name: "IX_StreetName_StreetNameId",
+                schema: "StreetNameRegistryLdes",
+                table: "StreetName",
                 column: "StreetNameId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "StreetNameLinkedDataEventStream",
-                schema: "StreetNameRegistryLegacy");
+                name: "StreetName",
+                schema: "StreetNameRegistryLdes");
         }
     }
 }

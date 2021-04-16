@@ -10,8 +10,8 @@ using StreetNameRegistry.Projections.Legacy;
 namespace StreetNameRegistry.Projections.Legacy.Migrations
 {
     [DbContext(typeof(LegacyContext))]
-    [Migration("20210315090106_AddTableForLinkedDataEventStream")]
-    partial class AddTableForLinkedDataEventStream
+    [Migration("20210415182454_AddLinkedDataEventStream")]
+    partial class AddLinkedDataEventStream
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -164,12 +164,12 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
                         .IsClustered();
 
                     b.HasIndex("Position")
-                        .HasDatabaseName("CI_StreetNameLinkedDataEventStream_Position")
+                        .HasDatabaseName("CI_StreetName_Position")
                         .HasAnnotation("SqlServer:ColumnStoreIndex", "");
 
                     b.HasIndex("StreetNameId");
 
-                    b.ToTable("StreetNameLinkedDataEventStream", "StreetNameRegistryLegacy");
+                    b.ToTable("StreetName", "StreetNameRegistryLdes");
                 });
 
             modelBuilder.Entity("StreetNameRegistry.Projections.Legacy.StreetNameList.StreetNameListItem", b =>

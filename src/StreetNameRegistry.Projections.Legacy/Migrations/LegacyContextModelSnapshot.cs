@@ -162,12 +162,12 @@ namespace StreetNameRegistry.Projections.Legacy.Migrations
                         .IsClustered();
 
                     b.HasIndex("Position")
-                        .HasDatabaseName("CI_StreetNameLinkedDataEventStream_Position")
+                        .HasDatabaseName("CI_StreetName_Position")
                         .HasAnnotation("SqlServer:ColumnStoreIndex", "");
 
                     b.HasIndex("StreetNameId");
 
-                    b.ToTable("StreetNameLinkedDataEventStream", "StreetNameRegistryLegacy");
+                    b.ToTable("StreetName", "StreetNameRegistryLdes");
                 });
 
             modelBuilder.Entity("StreetNameRegistry.Projections.Legacy.StreetNameList.StreetNameListItem", b =>

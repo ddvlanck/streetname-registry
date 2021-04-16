@@ -81,11 +81,11 @@ namespace StreetNameRegistry.Projections.Legacy.StreetNameLinkedDataEventStream
 
     public class StreetNameLinkedDataEventStreamConfiguration : IEntityTypeConfiguration<StreetNameLinkedDataEventStreamItem>
     {
-        private const string TableName = "StreetNameLinkedDataEventStream";
+        private const string TableName = "StreetName";
 
         public void Configure(EntityTypeBuilder<StreetNameLinkedDataEventStreamItem> builder)
         {
-            builder.ToTable(TableName, Schema.Legacy)
+            builder.ToTable(TableName, Schema.LinkedDataEventStream)
                 .HasKey(x => x.Position)
                 .IsClustered();
 
